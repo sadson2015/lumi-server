@@ -1,47 +1,23 @@
 'use strict';
 
-// private/protected variables
-const __ = {};
-const __event = {};
-
 const events = require('events');
 
 class ModelBase {
 	constructor(data, gateway) {
-		this.__oid = `${data.sid}-${Date.now()}`;
-		__[this.__oid] = {};
-		__[this.__oid].sid = data.sid;
-		__[this.__oid].model = data.model;
-		__[this.__oid].gateway = data.model == 'gateway' ? this : gateway;
+		this.sid = data.sid;
+		this.model = data.model;
+		this.shortId = data.short_id;
+		this.gateway = data.model == 'gateway' ? this : gateway;
 
 		// init events
-		__event[this.__oid] = new events.EventEmitter();
+		this.event = new events.EventEmitter();
 
 		this.log = gateway && gateway.log || console;
+		this.data = {};
 
 		if (typeof this.init == 'function') {
 			this.init();
 		}
-	}
-
-	// accessory sid
-	get sid() {
-		return __[this.__oid].sid;
-	}
-
-	// accessory model type
-	get model() {
-		return __[this.__oid].model;
-	}
-
-	// gateway
-	get gateway() {
-		return __[this.__oid].gateway;
-	}
-
-	// event
-	get event() {
-		return __event[this.__oid];
 	}
 
 	read() {
@@ -66,6 +42,22 @@ class ModelBase {
 			name,
 			callback.bind(this)
 		);
+	}
+
+	attr(name, args, func = function (...args) {
+		return args.length == 1 ? args[0] : args;
+	}) {
+		if (!args.length) {
+			return this.data[name];
+		}
+
+		let value = func.apply(this, args);
+
+		this.write({
+			[name]: value
+		});
+
+		return this;
 	}
 }
 

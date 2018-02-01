@@ -25,23 +25,12 @@ const models = {
 	motion: Motion,
 };
 
-// private/protected variables
-const __ = {};
-const __event = {};
-
 class LumiServer {
 	constructor(password = {}) {
-		this.__oid = `${Date.now()}`;
-		__[this.__oid] = {};
-		__[this.__oid].password = password;
-		__[this.__oid].accessorys = {};
+		this.password = password;
+		this.accessorys = {};
 
-		__event[this.__oid] = new events.EventEmitter();
-	}
-
-	// event
-	get event() {
-		return __event[this.__oid];
+		this.event = new events.EventEmitter();
 	}
 
 	on(name, callback) {
@@ -50,7 +39,7 @@ class LumiServer {
 }
 
 LumiServer.prototype.password = function(sid) {
-	return __[this.__oid].password[sid];
+	return this.password[sid];
 }
 
 LumiServer.prototype.start = function() {
@@ -123,21 +112,21 @@ LumiServer.prototype.initServerSocket = function() {
 }
 
 LumiServer.prototype.addAccessory = function(accessory) {
-	__[this.__oid].accessorys[accessory.sid] = accessory;
+	this.accessorys[accessory.sid] = accessory;
 	this.event.emit('add', accessory);
 }
 
 LumiServer.prototype.removeAccessory = function(sid) {
 	let accessory = this.getAccessory(sid);
 	if (accessory &&
-		delete __[this.__oid].accessorys[accessory.sid]
+		delete this.accessorys[accessory.sid]
 	) {	
 		this.event.emit('remove', accessory);
 	}
 }
 
 LumiServer.prototype.getAccessory = function(sid) {
-	return __[this.__oid].accessorys[sid];
+	return this.accessorys[sid];
 }
 
 LumiServer.prototype.send = function(message, ip, port) {
