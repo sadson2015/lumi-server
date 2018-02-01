@@ -60,24 +60,6 @@ LumiServer.prototype.start = function() {
 	this.send({
 		cmd: 'whois',
 	}, multicastAddress, multicastPort);
-
-	// Test Message
-	this.send({
-		cmd: 'iam',
-		port: '9898',
-		sid: '7811dcb26145',
-		model: 'gateway',
-		ip: '192.168.188.102'
-	}, '127.0.0.1', serverPort);
-
-	setTimeout(() => {
-		this.send({
-			cmd: 'get_id_list_ack',
-			sid: '7811dcb26145',
-			token: 'NTnN5noiIDi8JnFP',
-			data: '["158d000223a9d5","158d00020261a2","158d000202625d","158d0001e65556","158d0001fa67a6"]'
-		}, '127.0.0.1', serverPort);
-	}, 1000);
 }
 
 LumiServer.prototype.initServerSocket = function() {
