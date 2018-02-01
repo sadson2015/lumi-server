@@ -15,7 +15,7 @@ class ModelBase {
 		__[this.__oid].gateway = data.model == 'gateway' ? this : gateway;
 
 		// init events
-		__event[this] = new events.EventEmitter();
+		__event[this.__oid] = new events.EventEmitter();
 
 		this.log = gateway && gateway.log || console;
 
