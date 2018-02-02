@@ -9,9 +9,9 @@ server.on('add', function(accessory){
 	if (accessory.model == 'gateway') {
 		// event bind
 		accessory.on('heartbeat', function(data) {
-			// read attribute
+			// read attribute with read message
 			this.log.info(this.rgb());
-			// read attribute in cache, cannot send read message to lumi gateway
+			// read attribute in cache, cannot send read message
 			this.log.info(this.data.rgb);
 			// write attribute
 			this.rgb(Math.random()*255, Math.random()*255, Math.random()*255);

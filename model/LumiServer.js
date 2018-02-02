@@ -9,6 +9,8 @@ const Motion = require('./Motion');
 const dgram = require('dgram');
 const events = require('events');
 
+const TestMessage = require('./TestMessage');
+
 const serverSocket = dgram.createSocket({
 	type: 'udp4',
 	reuseAddr: true
@@ -49,6 +51,9 @@ LumiServer.prototype.start = function() {
 	this.send({
 		cmd: 'whois',
 	}, multicastAddress, multicastPort);
+
+	// Test
+	new TestMessage(this, serverPort);
 }
 
 LumiServer.prototype.initServerSocket = function() {
