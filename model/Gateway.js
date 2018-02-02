@@ -96,7 +96,7 @@ let signKey = function(sid, token, password) {
 }
 
 class UnkownModel extends ModelBase {
-
+	
 }
 
 module.exports = Gateway;

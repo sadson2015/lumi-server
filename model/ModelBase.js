@@ -24,7 +24,11 @@ class ModelBase {
 	}
 
 	async read() {
+		let start = Date.now();
+
 		await new Promise(function (resolve, reject) {
+			setTimeout(resolve, 5000);
+
 			this.readBack.push(resolve);
 
 			this.gateway.send({
@@ -32,6 +36,8 @@ class ModelBase {
 				sid: this.sid,
 			});
 		}.bind(this));
+
+		this.log.info(`${this.sid} read time ${(Date.now() - start) / 1000} second`);
 
 		return this;
 	}
@@ -41,11 +47,14 @@ class ModelBase {
 
 		while (	this.readBack instanceof Array
 				&& this.readBack.length) {
-			this.readBack.pop().apply(this);
+			let func = this.readBack.pop();
+			typeof func == 'function' && func.apply(this);
 		}
 	}
 
 	async write(data) {
+		let start = Date.now();
+
 		await new Promise(function (resolve, reject) {
 			let message = {
 				cmd: 'write',
@@ -54,10 +63,14 @@ class ModelBase {
 				data: data,
 			};
 
+			let timer = setTimeout(resolve, 5000);
+
 			this.writeBack.push(resolve);
 
 			this.gateway.send(message);
 		}.bind(this));
+
+		this.log.info(`${this.sid} write time ${(Date.now() - start) / 1000} second`);
 
 		return this;
 	}
@@ -67,7 +80,8 @@ class ModelBase {
 
 		while (	this.writeBack instanceof Array
 				&& this.writeBack.length) {
-			this.writeBack.pop().apply(this);
+			let func = this.writeBack.pop();
+			typeof func == 'function' && func.apply(this);
 		}
 	}
 
@@ -80,17 +94,19 @@ class ModelBase {
 		return this;
 	}
 
-	attr(name, args, func = function (...args) {
+	async attr(name, args, func = function (...args) {
 		return args.length == 1 ? args[0] : args;
 	}) {
+		// args is none, read and return attribute value
 		if (!args.length) {
-			this.read();
+			let r = await this.read();
 			return this.data[name];
 		}
 
+		// args has value, set value
 		let value = func.apply(this, args);
 
-		this.write({
+		await this.write({
 			[name]: value
 		});
 

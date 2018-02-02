@@ -8,20 +8,20 @@ server.on('add', function(accessory){
 
 	if (accessory.model == 'gateway') {
 		// event bind
-		accessory.on('heartbeat', function(data) {
-			// read attribute with read message
-			this.log.info(this.rgb());
-			// read attribute in cache, cannot send read message
-			this.log.info(this.data.rgb);
+		accessory.on('heartbeat', async function(data) {
 			// write attribute
-			this.rgb(Math.random()*255, Math.random()*255, Math.random()*255);
+			this.rgb(Math.random() * 255, Math.random() * 255, Math.random() * 255);
+			// read attribute in cache, cannot send read message
+			this.log.info(`rgb from cache ${this.data.rgb}`);
+			// read attribute with read message
+			this.log.info(`rgb from read callback ${await this.rgb()}`);
 		});
 	}
 })
 
 // all server recive message
 server.on('message', function(data, from){
-	this.log.info('[recv]', data, from);
+	// this.log.info('[recv message]', data, from);
 })
 
 server.start();

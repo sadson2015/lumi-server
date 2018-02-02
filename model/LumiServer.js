@@ -53,7 +53,7 @@ LumiServer.prototype.start = function() {
 	}, multicastAddress, multicastPort);
 
 	// Test
-	new TestMessage(this, serverPort);
+	// new TestMessage(this, serverPort);
 }
 
 LumiServer.prototype.initServerSocket = function() {
@@ -69,7 +69,7 @@ LumiServer.prototype.initServerSocket = function() {
 			this.log.error(`socket message error: ${message}`);
 			return;
 		}
-		this.log.debug('[recv]', data, from);
+		this.log.debug('\x1b[34m', '[recv]', '\x1b[0m', data, from);
 
 		this.event.emit('message', data, from);
 
@@ -79,7 +79,10 @@ LumiServer.prototype.initServerSocket = function() {
 		// create new accessory and inhert unkown model gateway
 		if (accessory && accessory.model == 'unkown') {
 			if (accessory.gateway) {
-				accessory = new models[data.model](data, accessory.gateway);
+				let unkown = accessory;
+				accessory = new models[data.model](data, unkown.gateway);
+				accessory.readBack = unkown.readBack;
+				accessory.writeBack = unkown.writeBack;
 				this.addAccessory(accessory);
 			} else {
 				this.log.warn(`${data.model}(${data.sid}) cannot get unkown model gateway`);
@@ -138,7 +141,7 @@ LumiServer.prototype.getAccessory = function(sid) {
 }
 
 LumiServer.prototype.send = function(message, ip, port) {
-	this.log.debug('[send]', message, ip, port);
+	this.log.debug('\x1b[31m', '[send]', '\x1b[0m', message, ip, port);
 	let strMsg = JSON.stringify(message);
 	serverSocket.send(strMsg, 0, strMsg.length, port, ip);
 }
