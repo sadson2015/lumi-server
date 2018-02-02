@@ -57,6 +57,9 @@ LumiServer.prototype.initServerSocket = function() {
 		let data = {};
 		try {
 			data = JSON.parse(message);
+			if (data.data) {
+				data.data = JSON.parse(data.data);
+			}
 		} catch(err) {
 			this.log.error(`socket message error: ${message}`);
 			return;

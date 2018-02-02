@@ -66,7 +66,7 @@ class Gateway extends ModelBase {
 		this.token = data.token;
 
 		// gateway and sub accessorys
-		let ids = JSON.parse(data.data);
+		let ids = data.data;
 		this.children = ids;
 
 		this.read();
@@ -82,16 +82,8 @@ class Gateway extends ModelBase {
 		}
 	}
 
-	readAck(data, from) {
-		this.data = JSON.parse(data.data);
-	}
-
-	writeAck(data, from) {
-		this.data = JSON.parse(data.data);
-	}
-
 	report(data, from) {
-		this.data = JSON.parse(data.data);
+		this.data = data.data;
 	}
 }
 

@@ -15,26 +15,60 @@ class ModelBase {
 		this.log = gateway && gateway.log || console;
 		this.data = {};
 
+		this.readBack = [];
+		this.writeBack = [];
+
 		if (typeof this.init == 'function') {
 			this.init();
 		}
 	}
 
-	read() {
-		this.gateway.send({
-			cmd: 'read',
-			sid: this.sid,
-		});
+	async read() {
+		await new Promise(function (resolve, reject) {
+			this.readBack.push(resolve);
+
+			this.gateway.send({
+				cmd: 'read',
+				sid: this.sid,
+			});
+		}.bind(this));
+
+		return this;
 	}
 
-	write(data) {
-		let message = {
-			cmd: 'write',
-			sid: this.sid,
-			model: this.model,
-			data: data,
-		};
-		this.gateway.send(message);
+	readAck(data, from) {
+		this.data = data.data;
+
+		while (	this.readBack instanceof Array
+				&& this.readBack.length) {
+			this.readBack.pop().apply(this);
+		}
+	}
+
+	async write(data) {
+		await new Promise(function (resolve, reject) {
+			let message = {
+				cmd: 'write',
+				sid: this.sid,
+				model: this.model,
+				data: data,
+			};
+
+			this.writeBack.push(resolve);
+
+			this.gateway.send(message);
+		}.bind(this));
+
+		return this;
+	}
+
+	writeAck(data, from) {
+		this.data = data.data;
+
+		while (	this.writeBack instanceof Array
+				&& this.writeBack.length) {
+			this.writeBack.pop().apply(this);
+		}
 	}
 
 	on(name, callback) {
@@ -42,12 +76,15 @@ class ModelBase {
 			name,
 			callback.bind(this)
 		);
+
+		return this;
 	}
 
 	attr(name, args, func = function (...args) {
 		return args.length == 1 ? args[0] : args;
 	}) {
 		if (!args.length) {
+			this.read();
 			return this.data[name];
 		}
 

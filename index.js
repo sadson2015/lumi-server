@@ -10,7 +10,9 @@ server.on('add', function(accessory){
 		// event bind
 		accessory.on('heartbeat', function(data) {
 			// read attribute
-			console.log(this.rgb());
+			this.log.info(this.rgb());
+			// read attribute in cache, cannot send read message to lumi gateway
+			this.log.info(this.data.rgb);
 			// write attribute
 			this.rgb(Math.random()*255, Math.random()*255, Math.random()*255);
 		});
