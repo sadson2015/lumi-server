@@ -56,10 +56,10 @@ config.js
 #### 方法
 1. click - 模拟按下
 2. doubleClick - 模拟连按两次
-3. longClick - 模拟长按，可设置长按时长，默认1秒，最长10秒
+3. longClick - 模拟长按，可设置长按时长，默认0秒，最长10秒
 
 #### 事件
 1. click - 当按下时触发
 2. doubleClick - 当连按两次时触发
 3. longClickPress - 当长按开始时触发
-4. longClickRelease - 当长按松开时触发
+4. longClick - 当长按松开时触发
