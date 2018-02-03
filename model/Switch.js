@@ -3,32 +3,46 @@
 const ModelBase = require('./ModelBase');
 
 class Switch extends ModelBase {
-	click() {
-		this.write({
+	voltage(...args) {
+		return this.readonly('voltage', args);
+	}
+
+	async click() {
+		await this.write({
 			status: 'click',
 		});
+		this.event.emit('click');
 	}
 
-	doubleClick() {
-		this.write({
+	async doubleClick() {
+		await this.write({
 			status: 'double_click',
 		});
+		this.event.emit('doubleClick');
 	}
 
-	// default realse time 1 second, time limit less then 10 second
-	longClick(releaseTime) {
-		this.write({
+	// default realse time 2 second, time limit less then 10 second
+	async longClick(releaseTime = 0) {
+		releaseTime = Math.min(releaseTime, 10 * 1000);
+
+		await this.write({
 			status: 'long_click_press',
 		});
-		setTimeout(() => {
-			this.write({
+		this.event.emit('longClickPress');
+
+		setTimeout(async () => {
+			await this.write({
 				status: 'long_click_release',
 			});
-		}, Math.min(releaseTime || 1000, 10 * 1000));
+			this.event.emit('longClick', releaseTime);
+		}, releaseTime);
 	}
 
 	report(data, from) {
-		let reportType = data.data.channel_0;
+		this.data = data.data;
+
+		let reportType = data.data.status;
+
 		switch(reportType) {
 			case 'click':
 				this.event.emit('click');
@@ -37,13 +51,15 @@ class Switch extends ModelBase {
 				this.event.emit('doubleClick');
 				break;
 			case 'long_click_press':
+				this.longStartTime = Date.now();
 				this.event.emit('longClickPress');
 				break;
 			case 'long_click_release':
-				this.event.emit('longClickRelease');
+				// long click start with 2 second
+				this.event.emit('longClick', Date.now() - this.longStartTime + 2000);
 				break;
 			default:
-				this.log.warn(`unkown channel_0 ${reportType}`);
+				this.log.warn(`status channel_0 ${reportType}`);
 		}
 	}
 }

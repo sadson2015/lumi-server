@@ -3,7 +3,18 @@
 const ModelBase = require('./ModelBase');
 
 class Magnet extends ModelBase {
+
+	status(...args) {
+		return this.readonly('status', args);
+	}
+
+	voltage(...args) {
+		return this.readonly('voltage', args);
+	}
+
 	report(data, from) {
+		this.data = data.data;
+
 		let status = data.data.status;
 
 		switch(status) {

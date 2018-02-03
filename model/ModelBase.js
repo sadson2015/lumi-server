@@ -94,17 +94,26 @@ class ModelBase {
 		return this;
 	}
 
-	async attr(name, args, func = function (...args) {
+	async readonly(name, args, setter, getter) {
+		return this.attr(name, [], function () {
+			this.log.warn(`cannot set ${this.model}(${this.sid}) ${name}`);
+			return;
+		}, getter);
+	}
+
+	async attr(name, args = [], setter = function (value) {
+		return value;
+	}, getter = function (...args) {
 		return args.length == 1 ? args[0] : args;
 	}) {
 		// args is none, read and return attribute value
 		if (!args.length) {
-			let r = await this.read();
-			return this.data[name];
+			await this.read();
+			return getter.apply(this, [this.data[name]]);
 		}
 
 		// args has value, set value
-		let value = func.apply(this, args);
+		let value = setter.apply(this, args);
 
 		await this.write({
 			[name]: value

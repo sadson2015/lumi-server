@@ -29,8 +29,8 @@ class Gateway extends ModelBase {
 	}
 
 	// attributes
-	rgb(...args) {
-		return this.attr('rgb', args,
+	async rgbb(...args) {
+		let result = await this.attr('rgb', args,
 			function (red, green, blue, brightness) {
 				// get brightness, inherit current brightness, default 100%(255)
 				brightness = brightness || this.data.rgb >> 24 || 255;
@@ -39,8 +39,47 @@ class Gateway extends ModelBase {
 						red * Math.pow(16, 4) 			+
 						green * Math.pow(16, 2) 		+
 						blue
-			}
-		);
+			});
+
+		if (args.length) {
+			return result;
+		} else {
+			return {
+				red: result % 256,
+				green: (result >> 8) % 256,
+				blue: (result >> 16) % 256,
+				brightness: Math.round((result >> 24) % 256 / 255 * 100) / 100,
+			};
+		}
+	}
+
+	async rgb(...args) {
+		let result;
+		if (!args.length) {
+			result = await this.rgbb();
+			delete result.brightness;
+			return result;
+		} else {
+			result = await this.rgbb.apply(this, args);
+
+			return result;
+		}
+	}
+
+	async brightness(...args) {
+		let result;
+
+		if (!args.length) {
+			result = await this.rgbb();
+			return result.brightness;
+		} else {
+			let rgb = [	this.data.rgb % 256,
+						this.data.rgb >> 8 % 256,
+						this.data.rgb >> 16 %256];
+			result = await this.rgbb.apply(this, rgb.concat(args[0]));
+
+			return result;
+		}
 	}
 
 	getIdList() {
@@ -96,7 +135,7 @@ let signKey = function(sid, token, password) {
 }
 
 class UnkownModel extends ModelBase {
-	
+
 }
 
 module.exports = Gateway;
