@@ -8,6 +8,7 @@ class ModelBase {
 		this.model = data.model;
 		this.shortId = data.short_id;
 		this.gateway = data.model == 'gateway' ? this : gateway;
+		this.dataUpdateTime = 0;
 
 		// init events
 		this.event = new events.EventEmitter();
@@ -26,16 +27,22 @@ class ModelBase {
 	async read() {
 		let start = Date.now();
 
-		await new Promise(function (resolve, reject) {
-			setTimeout(resolve, 5000);
+		// data update over 20 millisecond
+		if (Date.now() - this.dataUpdateTime > 20) {
+			await new Promise(function (resolve, reject) {
+				setTimeout(resolve, 1000);
 
-			this.readBack.push(resolve);
+				this.readBack.push(resolve);
 
-			this.gateway.send({
-				cmd: 'read',
-				sid: this.sid,
-			});
-		}.bind(this));
+				// if wait for read, then not send read message again
+				if (this.readBack.length == 1) {
+					this.gateway.send({
+						cmd: 'read',
+						sid: this.sid,
+					});
+				}
+			}.bind(this));
+		}
 
 		this.log.info(`${this.sid} read time ${(Date.now() - start) / 1000} second`);
 
@@ -43,8 +50,6 @@ class ModelBase {
 	}
 
 	readAck(data, from) {
-		this.data = data.data;
-
 		while (	this.readBack instanceof Array
 				&& this.readBack.length) {
 			let func = this.readBack.pop();
@@ -56,18 +61,18 @@ class ModelBase {
 		let start = Date.now();
 
 		await new Promise(function (resolve, reject) {
-			let message = {
+			setTimeout(resolve, 1000);
+
+			this.writeBack.push(resolve);
+			// clear update time to reload
+			this.dataUpdateTime = 0;
+
+			this.gateway.send({
 				cmd: 'write',
 				sid: this.sid,
 				model: this.model,
 				data: data,
-			};
-
-			let timer = setTimeout(resolve, 5000);
-
-			this.writeBack.push(resolve);
-
-			this.gateway.send(message);
+			});
 		}.bind(this));
 
 		this.log.info(`${this.sid} write time ${(Date.now() - start) / 1000} second`);
@@ -76,8 +81,6 @@ class ModelBase {
 	}
 
 	writeAck(data, from) {
-		this.data = data.data;
-
 		while (	this.writeBack instanceof Array
 				&& this.writeBack.length) {
 			let func = this.writeBack.pop();
@@ -120,6 +123,12 @@ class ModelBase {
 		});
 
 		return this;
+	}
+
+	setData(data, cmd) {
+		this.log.info('setdata ==================', data);
+		this.data = data;
+		return true;
 	}
 }
 

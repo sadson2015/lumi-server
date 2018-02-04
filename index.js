@@ -9,6 +9,7 @@ server.on('add', async function(accessory){
 	switch (accessory.model) {
 		// 多功能网关
 		case 'gateway':
+			return;
 			// event bind
 			accessory.on('heartbeat', async function(data) {
 				// write attribute
@@ -56,6 +57,17 @@ server.on('add', async function(accessory){
 				accessory.doubleClick(2000);
 			}, 3000);
 
+			break;
+		// 插座
+		case 'plug':
+			setTimeout(async () => {
+				// less then 20 millisecond cannot read again
+				this.log.info('status', await accessory.status());
+				this.log.info('inuse', await accessory.inuse());
+				await accessory.status('on');
+				this.log.info('consumed', await accessory.consumed());
+				this.log.info('power', await accessory.power());
+			}, 1000);
 			break;
 	}
 })

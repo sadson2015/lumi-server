@@ -97,7 +97,6 @@ class Gateway extends ModelBase {
 
 	heartbeat(data, from) {
 		this.token = data.token;
-
 		this.event.emit('heartbeat', data);
 	}
 
@@ -121,8 +120,13 @@ class Gateway extends ModelBase {
 		}
 	}
 
-	report(data, from) {
-		this.data = data.data;
+	setData(data, cmd) {
+		if (cmd != 'heartbeat') {
+			this.data = data;
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
 

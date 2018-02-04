@@ -99,6 +99,13 @@ LumiServer.prototype.initServerSocket = function() {
 			// execute accessory cmd function
 			let cmd = data.cmd.replace(/_\w/g, i => i.substr(1).toUpperCase());
 
+			if (['readAck', 'writeAck', 'report', 'heartbeat'].indexOf(cmd) != -1 &&
+				typeof accessory.setData == 'function') {
+				if (accessory.setData(data.data, cmd)) {
+					accessory.dataUpdateTime = Date.now();
+				}
+			}
+
 			if (typeof accessory[cmd] == 'function') {
 				accessory[cmd].apply(accessory, [data, from]);
 			} else {

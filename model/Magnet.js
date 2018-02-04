@@ -13,8 +13,6 @@ class Magnet extends ModelBase {
 	}
 
 	report(data, from) {
-		this.data = data.data;
-
 		let status = data.data.status;
 
 		switch(status) {

@@ -9,7 +9,7 @@ class Plug extends ModelBase {
 	}
 
 	status(...args) {
-		return this.readonly('status', args);
+		return this.attr('status', args);
 	}
 
 	inuse(...args) {
@@ -25,8 +25,6 @@ class Plug extends ModelBase {
 	}
 
 	report(data, from) {
-		this.data = data.data;
-
 		let status = data.data.status;
 
 		switch(status) {

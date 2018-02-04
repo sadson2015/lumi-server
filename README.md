@@ -8,6 +8,12 @@
 
 config.js
 
+## 服务器 LumiServer
+
+#### 事件
+1. add - 当设备添加时触发
+2. message - 当收到消息时触发
+
 ## 可用设备
 
 ### 多功能网关 Gateway

@@ -9,8 +9,6 @@ class Motion extends ModelBase {
 	}
 
 	report(data, from) {
-		this.data = data.data;
-
 		if (data.data.status == 'motion') {
 			this.event.emit('motion');
 		}

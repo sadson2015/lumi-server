@@ -39,8 +39,6 @@ class Switch extends ModelBase {
 	}
 
 	report(data, from) {
-		this.data = data.data;
-
 		let reportType = data.data.status;
 
 		switch(reportType) {
