@@ -49,7 +49,7 @@ config.js
 
 #### 属性
 1. voltage - (只读)
-2. status - (只读)
+2. status - 打开/关闭(on/off)
 3. inuse - (只读)
 4. consumed - (只读)
 5. power - (只读)
