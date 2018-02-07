@@ -10,13 +10,13 @@ class Motion extends ModelBase {
 
 	report(data, from) {
 		if (data.data.status == 'motion') {
-			this.event.emit('motion');
+			this.emit('motion');
 		}
 
 		if (data.data.no_motion) {
 			// on emit  120" 180" ...
 			let timer = data.data.no_motion;
-			this.event.emit('no_motion', timer);
+			this.emit('no_motion', timer);
 		}
 	}
 }

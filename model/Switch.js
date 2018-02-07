@@ -11,14 +11,14 @@ class Switch extends ModelBase {
 		await this.write({
 			status: 'click',
 		});
-		this.event.emit('click');
+		this.emit('click');
 	}
 
 	async doubleClick() {
 		await this.write({
 			status: 'double_click',
 		});
-		this.event.emit('doubleClick');
+		this.emit('doubleClick');
 	}
 
 	// default realse time 2 second, time limit less then 10 second
@@ -28,13 +28,13 @@ class Switch extends ModelBase {
 		await this.write({
 			status: 'long_click_press',
 		});
-		this.event.emit('longClickPress');
+		this.emit('longClickPress');
 
 		setTimeout(async () => {
 			await this.write({
 				status: 'long_click_release',
 			});
-			this.event.emit('longClick', releaseTime);
+			this.emit('longClick', releaseTime);
 		}, releaseTime);
 	}
 
@@ -43,21 +43,21 @@ class Switch extends ModelBase {
 
 		switch(reportType) {
 			case 'click':
-				this.event.emit('click');
+				this.emit('click');
 				break;
 			case 'double_click':
-				this.event.emit('doubleClick');
+				this.emit('doubleClick');
 				break;
 			case 'long_click_press':
 				this.longStartTime = Date.now();
-				this.event.emit('longClickPress');
+				this.emit('longClickPress');
 				break;
 			case 'long_click_release':
 				// long click start with 2 second
-				this.event.emit('longClick', Date.now() - this.longStartTime + 2000);
+				this.emit('longClick', Date.now() - this.longStartTime + 2000);
 				break;
 			default:
-				this.log.warn(`status channel_0 ${reportType}`);
+				this.warn(`status channel_0 ${reportType}`);
 		}
 	}
 }

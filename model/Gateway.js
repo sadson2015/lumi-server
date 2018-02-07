@@ -97,7 +97,7 @@ class Gateway extends ModelBase {
 
 	heartbeat(data, from) {
 		this.token = data.token;
-		this.event.emit('heartbeat', data);
+		this.emit('heartbeat', data);
 	}
 
 	getIdListAck(data, from) {

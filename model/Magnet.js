@@ -17,13 +17,13 @@ class Magnet extends ModelBase {
 
 		switch(status) {
 			case 'open':
-				this.event.emit('open');
+				this.emit('open');
 				break;
 			case 'close':
-				this.event.emit('close');
+				this.emit('close');
 				break;
 			default:
-				this.log.warn(`unkown status ${status}`);
+				this.warn(`unkown status ${status}`);
 		}
 	}
 }

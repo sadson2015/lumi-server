@@ -29,13 +29,13 @@ class Plug extends ModelBase {
 
 		switch(status) {
 			case 'on':
-				this.event.emit('on');
+				this.emit('on');
 				break;
 			case 'off':
-				this.event.emit('off');
+				this.emit('off');
 				break;
 			default:
-				this.log.warn(`unkown status ${status}`);
+				this.warn(`unkown status ${status}`);
 		}
 	}
 }

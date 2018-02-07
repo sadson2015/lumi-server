@@ -1,5 +1,6 @@
 'use strict';
 
+const Basic = require('./Basic');
 const Gateway = require('./Gateway');
 const Plug = require('./Plug');
 const Switch = require('./Switch');
@@ -7,7 +8,6 @@ const Magnet = require('./Magnet');
 const Motion = require('./Motion');
 
 const dgram = require('dgram');
-const events = require('events');
 
 const TestMessage = require('./TestMessage');
 
@@ -27,16 +27,11 @@ const models = {
 	motion: Motion,
 };
 
-class LumiServer {
+class LumiServer extends Basic {
 	constructor(password = {}) {
+		super();
 		this.password = password;
 		this.accessorys = {};
-
-		this.event = new events.EventEmitter();
-	}
-
-	on(name, callback) {
-		this.event.on(name, callback.bind(this));
 	}
 }
 
@@ -66,12 +61,12 @@ LumiServer.prototype.initServerSocket = function() {
 				data.data = JSON.parse(data.data);
 			}
 		} catch(err) {
-			this.log.error(`socket message error: ${message}`);
+			this.error(`socket message error: ${message}`);
 			return;
 		}
-		this.log.debug('\x1b[34m', '[recv]', '\x1b[0m', data, from);
+		this.debug('\x1b[34m', '[recv]', '\x1b[0m', data, from);
 
-		this.event.emit('message', data, from);
+		this.emit('message', data, from);
 
 		// get accessory from cache
 		let accessory = this.getAccessory(data.sid);
@@ -85,7 +80,7 @@ LumiServer.prototype.initServerSocket = function() {
 				accessory.writeBack = unkown.writeBack;
 				this.addAccessory(accessory);
 			} else {
-				this.log.warn(`${data.model}(${data.sid}) cannot get unkown model gateway`);
+				this.warn(`${data.model}(${data.sid}) cannot get unkown model gateway`);
 			}
 		}
 
@@ -109,20 +104,20 @@ LumiServer.prototype.initServerSocket = function() {
 			if (typeof accessory[cmd] == 'function') {
 				accessory[cmd].apply(accessory, [data, from]);
 			} else {
-				this.log.warn(`${data.model}(${data.sid}) cannot found function ${cmd}`);
+				this.warn(`${data.model}(${data.sid}) cannot found function ${cmd}`);
 			}
 		} else {
-			this.log.warn(`unkown accessory ${data.model}(${data.sid})`);
+			this.warn(`unkown accessory ${data.model}(${data.sid})`);
 		}
 	});
 
 	// err - Error object, https://nodejs.org/api/errors.html
 	serverSocket.on('error', (err) => {
-		this.log.error(`socket error: ${err.stack}`);
+		this.error(`socket error: ${err.stack}`);
 	});
 
 	serverSocket.on('listening', () => {
-		this.log.info(`server is listening on ${serverSocket.address().address}:${serverSocket.address().port}`);
+		this.info(`server is listening on ${serverSocket.address().address}:${serverSocket.address().port}`);
 		serverSocket.addMembership(multicastAddress);
 	});
 
@@ -131,7 +126,7 @@ LumiServer.prototype.initServerSocket = function() {
 
 LumiServer.prototype.addAccessory = function(accessory) {
 	this.accessorys[accessory.sid] = accessory;
-	this.event.emit('add', accessory);
+	this.emit('add', accessory);
 }
 
 LumiServer.prototype.removeAccessory = function(sid) {
@@ -139,7 +134,7 @@ LumiServer.prototype.removeAccessory = function(sid) {
 	if (accessory &&
 		delete this.accessorys[accessory.sid]
 	) {	
-		this.event.emit('remove', accessory);
+		this.emit('remove', accessory);
 	}
 }
 
@@ -148,7 +143,7 @@ LumiServer.prototype.getAccessory = function(sid) {
 }
 
 LumiServer.prototype.send = function(message, ip, port) {
-	this.log.debug('\x1b[31m', '[send]', '\x1b[0m', message, ip, port);
+	this.debug('\x1b[31m', '[send]', '\x1b[0m', message, ip, port);
 	let strMsg = JSON.stringify(message);
 	serverSocket.send(strMsg, 0, strMsg.length, port, ip);
 }
