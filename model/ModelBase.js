@@ -27,7 +27,7 @@ class ModelBase extends Basic {
 	}
 
 	get logPrefix() {
-		return `${this.model}(${this.sid})`;
+		return super.logPrefix.concat([this.model, this.sid]);
 	}
 
 	async read() {
@@ -50,7 +50,7 @@ class ModelBase extends Basic {
 			}.bind(this));
 		}
 
-		this.info(`read time ${(Date.now() - start) / 1000} second`);
+		this.debug(`read time ${(Date.now() - start) / 1000} second`);
 
 		return this;
 	}
@@ -81,7 +81,7 @@ class ModelBase extends Basic {
 			});
 		}.bind(this));
 
-		this.info(`write time ${(Date.now() - start) / 1000} second`);
+		this.debug(`write time ${(Date.now() - start) / 1000} second`);
 
 		return this;
 	}

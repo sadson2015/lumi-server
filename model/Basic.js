@@ -1,6 +1,7 @@
 'use strict';
 
 const { EventEmitter } = require('events');
+const debug = require('debug');
 
 const log = Symbol('log');
 
@@ -21,11 +22,11 @@ module.exports = class extends EventEmitter {
 	}
 
 	get logPrefix() {
-		return '';
+		return ['lumi-server'];
 	}
 
 	info(...args) {
-		this[log].info.apply(this, ['[INFO]', this.logPrefix].concat(args));
+		this[log].info.apply(this, ['[INFO]', this.logPrefix.join(':')].concat(args));
 		return this;
 	}
 
@@ -34,17 +35,17 @@ module.exports = class extends EventEmitter {
 	}
 
 	warn(...args) {
-		this[log].warn.apply(this, ['[WARN]', this.logPrefix].concat(args));
+		this[log].warn.apply(this, ['[WARN]', this.logPrefix.join(':')].concat(args));
 		return this;
 	}
 
 	error(...args) {
-		this[log].error.apply(this, ['[ERROR]', this.logPrefix].concat(args));
+		this[log].error.apply(this, ['[ERROR]', this.logPrefix.join(':')].concat(args));
 		return this;
 	}
 
 	debug(...args) {
-		this[log].debug.apply(this, ['[DEBUG]', this.logPrefix].concat(args));
+		debug(this.logPrefix.join(':')).apply(this, [].concat(args));
 		return this;
 	}
 }

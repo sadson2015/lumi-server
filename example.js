@@ -53,7 +53,7 @@ server.on('add', async function(accessory){
 
 			setTimeout(function () {
 				// this.longClick(2000);
-				this.click();
+				// this.click();
 			}.bind(accessory), 3000);
 
 			break;
@@ -63,7 +63,7 @@ server.on('add', async function(accessory){
 				// less then 20 millisecond cannot read again
 				this.info('status', await accessory.status());
 				this.info('inuse', await accessory.inuse());
-				await accessory.status('on');
+				// await accessory.status('on');
 				this.info('consumed', await accessory.consumed());
 				this.info('power', await accessory.power());
 			}.bind(accessory), 1000);

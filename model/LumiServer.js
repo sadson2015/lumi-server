@@ -8,6 +8,7 @@ const Magnet = require('./Magnet');
 const Motion = require('./Motion');
 
 const dgram = require('dgram');
+const chalk = require('chalk');
 
 const TestMessage = require('./TestMessage');
 
@@ -32,6 +33,10 @@ class LumiServer extends Basic {
 		super();
 		this.password = password;
 		this.accessorys = {};
+	}
+
+	get logPrefix() {
+		return super.logPrefix.concat(['server']);
 	}
 }
 
@@ -64,7 +69,7 @@ LumiServer.prototype.initServerSocket = function() {
 			this.error(`socket message error: ${message}`);
 			return;
 		}
-		this.debug('\x1b[34m', '[recv]', '\x1b[0m', data, from);
+		this.debug(`${chalk.blue.bold('[recv]')}`, JSON.stringify(data), JSON.stringify(from));
 
 		this.emit('message', data, from);
 
@@ -126,7 +131,9 @@ LumiServer.prototype.initServerSocket = function() {
 
 LumiServer.prototype.addAccessory = function(accessory) {
 	this.accessorys[accessory.sid] = accessory;
-	this.emit('add', accessory);
+	if (accessory.model != 'unkown') {
+		this.emit('add', accessory);
+	}
 }
 
 LumiServer.prototype.removeAccessory = function(sid) {
@@ -143,8 +150,8 @@ LumiServer.prototype.getAccessory = function(sid) {
 }
 
 LumiServer.prototype.send = function(message, ip, port) {
-	this.debug('\x1b[31m', '[send]', '\x1b[0m', message, ip, port);
 	let strMsg = JSON.stringify(message);
+	this.debug(`${chalk.red.bold('[send]')}`, strMsg, ip, port);
 	serverSocket.send(strMsg, 0, strMsg.length, port, ip);
 }
 
